@@ -23,8 +23,7 @@ export interface PackageFormatOptions {
   dashManifestName?: string;
   hlsManifestName?: string;
   tsOutput?: boolean;
-  videoStreamDescriptors?: Record<string, string>;
-  audioStreamDescriptors?: Record<string, string>;
+  iframePlaylists?: boolean;
 }
 
 export interface PackageOptions {
@@ -334,10 +333,8 @@ export function createShakaArgs(
           );
         }
       }
-      if (packageFormatOptions?.videoStreamDescriptors) {
-        for (const [key, value] of Object.entries(packageFormatOptions.videoStreamDescriptors)) {
-          streamOptions.push(`${key}=${value}`);
-        }
+      if (packageFormatOptions?.iframePlaylists) {
+        streamOptions.push(`iframe_playlist_name=iframe-${input.key}.m3u8`);
       }
       cmdInputs.push(streamOptions.join(','));
     }
@@ -393,11 +390,6 @@ export function createShakaArgs(
           `init_segment=${playlistName}/init.mp4`,
           `segment_template=${segmentTemplate}`
         );
-      }
-    }
-    if (packageFormatOptions?.audioStreamDescriptors) {
-      for (const [key, value] of Object.entries(packageFormatOptions.audioStreamDescriptors)) {
-        streamOptions.push(`${key}=${value}`);
       }
     }
     cmdInputs.push(streamOptions.join(','));
