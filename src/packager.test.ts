@@ -564,4 +564,53 @@ describe('Test create shaka args', () => {
       'myDashManifest.mpd'
     ]);
   });
+
+  it('Should append videoStreamDescriptors to video stream options', async () => {
+    const args = createShakaArgs(singleInputVideo, true, {
+      videoStreamDescriptors: {
+        iframe_playlist_name: 'iframe.m3u8'
+      }
+    });
+    expect(args).toEqual([
+      'in=test.mp4,stream=video,playlist_name=video-1.m3u8,init_segment=video-1/init.mp4,segment_template=video-1/$Number$.m4s,iframe_playlist_name=iframe.m3u8',
+      '--hls_master_playlist_output',
+      'index.m3u8',
+      '--generate_static_live_mpd',
+      '--mpd_output',
+      'manifest.mpd'
+    ]);
+  });
+
+  it('Should append audioStreamDescriptors to audio stream options', async () => {
+    const args = createShakaArgs(
+      [
+        ...singleInputVideo,
+        {
+          type: 'audio',
+          filename: 'audio.mp4',
+          key: '2'
+        }
+      ],
+      true,
+      {
+        audioStreamDescriptors: {
+          hls_characteristics: 'public.accessibility.describes-video'
+        }
+      }
+    );
+    expect(args[1]).toBe(
+      'in=audio.mp4,stream=audio,playlist_name=audio.m3u8,hls_group_id=audio,hls_name=defaultaudio,init_segment=audio/init.mp4,segment_template=audio/$Number$.m4s,hls_characteristics=public.accessibility.describes-video'
+    );
+  });
+
+  it('Should append multiple videoStreamDescriptors', async () => {
+    const args = createShakaArgs(singleInputVideo, true, {
+      videoStreamDescriptors: {
+        iframe_playlist_name: 'iframe.m3u8',
+        trick_play_factor: '2'
+      }
+    });
+    expect(args[0]).toContain('iframe_playlist_name=iframe.m3u8');
+    expect(args[0]).toContain('trick_play_factor=2');
+  });
 });

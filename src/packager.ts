@@ -23,6 +23,8 @@ export interface PackageFormatOptions {
   dashManifestName?: string;
   hlsManifestName?: string;
   tsOutput?: boolean;
+  videoStreamDescriptors?: Record<string, string>;
+  audioStreamDescriptors?: Record<string, string>;
 }
 
 export interface PackageOptions {
@@ -332,6 +334,11 @@ export function createShakaArgs(
           );
         }
       }
+      if (packageFormatOptions?.videoStreamDescriptors) {
+        for (const [key, value] of Object.entries(packageFormatOptions.videoStreamDescriptors)) {
+          streamOptions.push(`${key}=${value}`);
+        }
+      }
       cmdInputs.push(streamOptions.join(','));
     }
     if (input.type === 'text') {
@@ -386,6 +393,11 @@ export function createShakaArgs(
           `init_segment=${playlistName}/init.mp4`,
           `segment_template=${segmentTemplate}`
         );
+      }
+    }
+    if (packageFormatOptions?.audioStreamDescriptors) {
+      for (const [key, value] of Object.entries(packageFormatOptions.audioStreamDescriptors)) {
+        streamOptions.push(`${key}=${value}`);
       }
     }
     cmdInputs.push(streamOptions.join(','));
